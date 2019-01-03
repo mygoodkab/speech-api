@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import { convertToText } from '../recognition';
 import { convertToSpeech } from '../textToSpeech';
 import { server, config } from '../index';
-import { naturalLang } from '../naturalLang';
+import { analyzeEntities, analyzeSentiment, analyzeSyntax, analyzeEntitySentiment } from '../naturalLang';
 const fileName = './src/resources/audio.raw';
 // const speech = require('@google-cloud/speech');
 const mongoObjectId = ObjectId;
@@ -257,12 +257,12 @@ module.exports = [
         },
 
     },
-    {  // POST Natural Language
+    {  // POST Natural Language Analyzing entities
         method: 'POST',
-        path: '/naturalLang',
+        path: '/naturalLang/entities',
         config: {
             auth: false,
-            description: 'Get wakeup database',
+            description: 'Get Natural Language Analyzing entities',
             tags: ['api'],
             validate: {
                 payload: {
@@ -272,7 +272,7 @@ module.exports = [
         }, handler: async (req, reply) => {
             try {
                 const payload = req.payload;
-                const resNaturalLang = await naturalLang(payload.text);
+                const resNaturalLang = await analyzeEntities(payload.text);
                 return {
                     statusCode: 200,
                     msg: 'OK',
@@ -282,5 +282,83 @@ module.exports = [
                 return Boom.badGateway(error)
             }
         }
-    }
+    },
+    {  // POST Natural Language Analyzing Sentiment
+        method: 'POST',
+        path: '/naturalLang/sentiment',
+        config: {
+            auth: false,
+            description: 'Get Natural Language Analyzing Sentiment',
+            tags: ['api'],
+            validate: {
+                payload: {
+                    text: Joi.string().required()
+                }
+            }
+        }, handler: async (req, reply) => {
+            try {
+                const payload = req.payload;
+                const resNaturalLang = await analyzeSentiment(payload.text);
+                return {
+                    statusCode: 200,
+                    msg: 'OK',
+                    data: resNaturalLang
+                }
+            } catch (error) {
+                return Boom.badGateway(error)
+            }
+        }
+    },
+    {  // POST Natural Language Analyzing Syntax
+        method: 'POST',
+        path: '/naturalLang/syntax',
+        config: {
+            auth: false,
+            description: 'Get Natural Language Analyzing Syntax',
+            tags: ['api'],
+            validate: {
+                payload: {
+                    text: Joi.string().required()
+                }
+            }
+        }, handler: async (req, reply) => {
+            try {
+                const payload = req.payload;
+                const resNaturalLang = await analyzeSyntax(payload.text);
+                return {
+                    statusCode: 200,
+                    msg: 'OK',
+                    data: resNaturalLang
+                }
+            } catch (error) {
+                return Boom.badGateway(error)
+            }
+        }
+    },
+    {  // POST Natural Language Entity Sentiment
+        method: 'POST',
+        path: '/naturalLang/entitySentiment',
+        config: {
+            auth: false,
+            description: 'Get Natural Language Analyzing Syntax',
+            tags: ['api'],
+            validate: {
+                payload: {
+                    text: Joi.string().required()
+                }
+            }
+        }, handler: async (req, reply) => {
+            try {
+                const payload = req.payload;
+                const resNaturalLang = await analyzeEntitySentiment(payload.text);
+                return {
+                    statusCode: 200,
+                    msg: 'OK',
+                    data: resNaturalLang
+                }
+            } catch (error) {
+                return Boom.badGateway(error)
+            }
+        }
+    },
 ]
